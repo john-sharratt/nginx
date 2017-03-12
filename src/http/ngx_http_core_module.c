@@ -4259,7 +4259,7 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
                 return NGX_CONF_ERROR;
 
 #endif
-            }
+            } 
 
             lsopt.set = 1;
             lsopt.bind = 1;
