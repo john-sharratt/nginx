@@ -4182,6 +4182,7 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         
         if (ngx_strncmp(value[n].data, "bind_to_device=", 15) == 0) {
             lsopt.bind_to_device = (char *) &value[n].data[15];
+            continue;
         }
 
         if (ngx_strncmp(value[n].data, "so_keepalive=", 13) == 0) {
