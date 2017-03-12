@@ -724,7 +724,7 @@ ngx_stream_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
         
         if (ngx_strncmp(value[i].data, "bind_to_device=", 15) == 0) {
-            ls.bind_to_device = (char *) &value[i].data[15];
+            ls->bind_to_device = (char *) &value[i].data[15];
         }
 
         if (ngx_strncmp(value[i].data, "so_keepalive=", 13) == 0) {
