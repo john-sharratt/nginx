@@ -62,7 +62,8 @@ typedef struct {
     int                            tcp_keepcnt;
 #endif
     int                            backlog;
-    int                            type;
+    int                            type;    
+    char                          *bind_to_device;
 } ngx_stream_listen_t;
 
 

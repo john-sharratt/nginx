@@ -18,7 +18,7 @@ static void ngx_drain_connections(ngx_cycle_t *cycle);
 
 ngx_listening_t *
 ngx_create_listening(ngx_conf_t *cf, struct sockaddr *sockaddr,
-    socklen_t socklen)
+    socklen_t socklen, char *btod)
 {
     size_t            len;
     ngx_listening_t  *ls;
@@ -71,6 +71,15 @@ ngx_create_listening(ngx_conf_t *cf, struct sockaddr *sockaddr,
     }
 
     ngx_memcpy(ls->addr_text.data, text, len);
+    
+    if (btod != NULL) {
+        ls->bind_to_device.len = strlen(btod);        
+        ls->bind_to_device.data = ngx_pnalloc(cf->pool, ls->bind_to_device.len + 1);
+        if (ls->bind_to_device.data == NULL) {
+            return NULL;
+        }        
+        ngx_memcpy(ls->bind_to_device.data, btod, ls->bind_to_device.len + 1);
+    }
 
     ls->fd = (ngx_socket_t) -1;
     ls->type = SOCK_STREAM;
@@ -469,6 +478,32 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 }
 
                 return NGX_ERROR;
+            }
+
+            if (ls[i].bind_to_device.len > 0)
+            {
+                ngx_log_debug2(NGX_LOG_DEBUG_CORE, log, 0,
+                               "setsockopt(SO_BINDTODEVICE) %V #%d ", &ls[i].bind_to_device, s);
+                
+                struct ifreq ifr;
+                memset(&ifr, 0, sizeof(ifr));
+                snprintf(ifr.ifr_name, ngx_min(sizeof(ifr.ifr_name), ls[i].bind_to_device.len), &ls[i].bind_to_device);
+                if (setsockopt(s, SOL_SOCKET, SO_BINDTODEVICE,
+                                (void *)&ifr, sizeof(ifr))
+                        == -1)
+                {
+                    ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
+                              "setsockopt(SO_BINDTODEVICE) %V failed",
+                                &ls[i].addr_text);
+
+                    if (ngx_close_socket(s) == -1) {
+                      ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
+                                    ngx_close_socket_n " %V failed",
+                                    &ls[i].addr_text);
+                    }
+
+                    return NGX_ERROR;
+                }
             }
 
 #if (NGX_HAVE_REUSEPORT)

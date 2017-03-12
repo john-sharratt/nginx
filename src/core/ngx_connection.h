@@ -22,6 +22,7 @@ struct ngx_listening_s {
     socklen_t           socklen;    /* size of sockaddr */
     size_t              addr_text_max_len;
     ngx_str_t           addr_text;
+    ngx_str_t           bind_to_device;
 
     int                 type;
 
@@ -50,7 +51,7 @@ struct ngx_listening_s {
 
     ngx_listening_t    *previous;
     ngx_connection_t   *connection;
-
+    
     ngx_uint_t          worker;
 
     unsigned            open:1;
@@ -204,7 +205,7 @@ struct ngx_connection_s {
 
 
 ngx_listening_t *ngx_create_listening(ngx_conf_t *cf, struct sockaddr *sockaddr,
-    socklen_t socklen);
+    socklen_t socklen, u_char *btod);
 ngx_int_t ngx_clone_listening(ngx_conf_t *cf, ngx_listening_t *ls);
 ngx_int_t ngx_set_inherited_sockets(ngx_cycle_t *cycle);
 ngx_int_t ngx_open_listening_sockets(ngx_cycle_t *cycle);

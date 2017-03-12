@@ -317,7 +317,7 @@ ngx_mail_optimize_servers(ngx_conf_t *cf, ngx_array_t *ports)
             }
 
             ls = ngx_create_listening(cf, &addr[i].opt.sockaddr.sockaddr,
-                                      addr[i].opt.socklen);
+                                      addr[i].opt.socklen, addr[i].opt.bind_to_device);
             if (ls == NULL) {
                 return NGX_CONF_ERROR;
             }

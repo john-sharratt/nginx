@@ -1706,9 +1706,9 @@ ngx_http_add_listening(ngx_conf_t *cf, ngx_http_conf_addr_t *addr)
     ngx_listening_t           *ls;
     ngx_http_core_loc_conf_t  *clcf;
     ngx_http_core_srv_conf_t  *cscf;
-
+    
     ls = ngx_create_listening(cf, &addr->opt.sockaddr.sockaddr,
-                              addr->opt.socklen);
+                              addr->opt.socklen, addr->opt.bind_to_device);
     if (ls == NULL) {
         return NULL;
     }

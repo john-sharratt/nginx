@@ -46,6 +46,7 @@ typedef struct {
     int                     tcp_keepcnt;
 #endif
     int                     backlog;
+    char                   *bind_to_device;
 } ngx_mail_listen_t;
 
 

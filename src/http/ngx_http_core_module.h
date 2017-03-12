@@ -102,6 +102,8 @@ typedef struct {
 #endif
 
     u_char                     addr[NGX_SOCKADDR_STRLEN + 1];
+    char                      *bind_to_device;
+    
 } ngx_http_listen_opt_t;
 
 

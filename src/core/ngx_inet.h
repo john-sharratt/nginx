@@ -12,6 +12,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
+#define NGX_IFNAME_STRLEN     16
 
 #define NGX_INET_ADDRSTRLEN   (sizeof("255.255.255.255") - 1)
 #define NGX_INET6_ADDRSTRLEN                                                 \
