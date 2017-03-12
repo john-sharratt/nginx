@@ -486,8 +486,8 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                                "setsockopt(SO_BINDTODEVICE) %V #%d ", &ls[i].bind_to_device, s);
                 
                 u_char deviceName[16];
-                ngx_memzero(deviceName, 16);
-                ngx_snprintf(&deviceName[0], ngx_min(15, ls[i].bind_to_device.len), ls[i].bind_to_device.data);
+                ngx_memzero(&deviceName[0], 16);
+                ngx_memcpy(&deviceName[0], ls[i].bind_to_device.data, ngx_min(15, ls[i].bind_to_device.len));
                 
                 if (setsockopt(s, SOL_SOCKET, SO_BINDTODEVICE, (void *)deviceName, 16) == -1)
                 {
