@@ -485,12 +485,11 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 ngx_log_debug2(NGX_LOG_DEBUG_CORE, log, 0,
                                "setsockopt(SO_BINDTODEVICE) %V #%d ", &ls[i].bind_to_device, s);
                 
-                struct ifreq ifr;
-                memset(&ifr, 0, sizeof(ifr));
-                snprintf(ifr.ifr_name, ngx_min(sizeof(ifr.ifr_name), ls[i].bind_to_device.len), &ls[i].bind_to_device);
-                if (setsockopt(s, SOL_SOCKET, SO_BINDTODEVICE,
-                                (void *)&ifr, sizeof(ifr))
-                        == -1)
+                char deviceName[16];
+                ngx_memzero(deviceName, 16);
+                snprintf(deviceName, ngx_min(15, ls[i].bind_to_device.len), &ls[i].bind_to_device);
+                
+                if (setsockopt(s, SOL_SOCKET, SO_BINDTODEVICE, (void *)deviceName, 16) == -1)
                 {
                     ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
                               "setsockopt(SO_BINDTODEVICE) %V failed",
