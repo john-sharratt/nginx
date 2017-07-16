@@ -1109,13 +1109,24 @@ ngx_inet_resolve_host(ngx_pool_t *pool, ngx_url_t *u)
     struct sockaddr_in6  *sin6;
 
     port = htons(u->port);
+    
+    // Handle brackets around IPv6 addresses
+    u_char               *host_data = u->host.data;
+    size_t                host_len = u->host.len;
+    if (host_len > 0 && host_data[0] == '[') {
+        host_data++;
+        host_len--;
+    }
+    if (host_len > 0 && host_data[host_len-1] == ']') {
+        host_len--;
+    }
 
-    host = ngx_alloc(u->host.len + 1, pool->log);
+    host = ngx_alloc(host_len + 1, pool->log);
     if (host == NULL) {
         return NGX_ERROR;
     }
 
-    (void) ngx_cpystrn(host, u->host.data, u->host.len + 1);
+    (void) ngx_cpystrn(host, host_data, host_len + 1);
 
     ngx_memzero(&hints, sizeof(struct addrinfo));
     hints.ai_family = AF_UNSPEC;
