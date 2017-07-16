@@ -1124,13 +1124,14 @@ ngx_inet_resolve_host(ngx_pool_t *pool, ngx_url_t *u)
     hints.ai_flags = AI_ADDRCONFIG;
 #endif
 
-    if (getaddrinfo((char *) host, NULL, &hints, &res) != 0) {
+    if (getaddrinfo((char *) host, NULL, &hints, &res) != 0)
+    {
+        ngx_log_error(NGX_LOG_EMERG, pool->log, 0,
+                          "getaddrinfo failed on host: %s", host);
         u->err = "host not found";
         ngx_free(host);
         return NGX_ERROR;
     }
-
-    ngx_free(host);
 
     for (i = 0, rp = res; rp != NULL; rp = rp->ai_next) {
 
@@ -1148,9 +1149,14 @@ ngx_inet_resolve_host(ngx_pool_t *pool, ngx_url_t *u)
     }
 
     if (i == 0) {
+        ngx_log_error(NGX_LOG_EMERG, pool->log, 0,
+                          "getaddrinfo returned no addresses for host: %s", host);
         u->err = "host not found";
+        ngx_free(host);
         goto failed;
     }
+    
+    ngx_free(host);
 
     /* MP: ngx_shared_palloc() */
 
@@ -1270,12 +1276,15 @@ ngx_inet_resolve_host(ngx_pool_t *pool, ngx_url_t *u)
 
         h = gethostbyname((char *) host);
 
-        ngx_free(host);
-
         if (h == NULL || h->h_addr_list[0] == NULL) {
+            ngx_log_error(NGX_LOG_EMERG, pool->log, 0,
+                          "gethostbyname returned no addresses for host: %s", host);
             u->err = "host not found";
+            ngx_free(host);
             return NGX_ERROR;
         }
+        
+        ngx_free(host);
 
         for (i = 0; h->h_addr_list[i] != NULL; i++) { /* void */ }
 
